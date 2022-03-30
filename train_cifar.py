@@ -1,4 +1,5 @@
 from __future__ import print_function
+from enum import Flag
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activation
 from tensorflow.keras.layers import AveragePooling2D, Input, Flatten
@@ -14,7 +15,11 @@ import numpy as np
 import os
 from model import resnet_v1
 from utils import *
+import random
 
+random.seed(FLAGS.seed)
+np.random.seed(FLAGS.seed)
+tf.random.set_seed(FLAGS.seed)
 
 # Training parameters
 epochs = 200
@@ -101,7 +106,11 @@ print(model_type)
 
 # Prepare model model saving directory.
 save_dir = os.path.join(
-    os.getcwd(),
+    os.getcwd() if FLAGS.model_dir == "" else FLAGS.model_dir, "seed_" + str(FLAGS.seed)
+)
+
+save_dir = os.path.join(
+    save_dir,
     FLAGS.dataset
     + "_EE_LED_saved_models"
     + str(FLAGS.num_models)
@@ -112,6 +121,7 @@ save_dir = os.path.join(
     + "_"
     + str(FLAGS.augmentation),
 )
+
 model_name = "model.{epoch:03d}.h5"
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)

@@ -5,11 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "bashdb",
+            "request": "launch",
+            "name": "Bash-Debug (select script from list of sh files)",
+            "cwd": "${workspaceFolder}",
+            "program": "${command:SelectScriptName}",
+            "args": []
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "args": [
+                "--model_dir=/home/sultan/Documents/ADP/models",
+                "--seed=234",
                 "--lamda=2",
                 "--log_det_lamda=0.5",
                 "--num_models=2",
