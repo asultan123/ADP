@@ -1,6 +1,0 @@
-2022-03-29 22:33:31.470753: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  SSE4.1 SSE4.2 AVX AVX2 FMA
-To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2022-03-29 22:33:32.044736: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1510] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 10782 MB memory:  -> device: 0, name: Tesla K40m, pci bus id: 0000:0b:00.0, compute capability: 3.5
-2022-03-29 22:33:34.607042: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:185] None of the MLIR Optimization Passes are enabled (registered 2)
-2022-03-29 22:33:42.058383: I tensorflow/stream_executor/cuda/cuda_dnn.cc:369] Loaded cuDNN version 8201
-2022-03-29 22:33:43.152167: I tensorflow/core/util/cuda_solvers.cc:180] Creating CudaSolver handles for stream 0x557ff0191d30
