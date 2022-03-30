@@ -1,15 +1,17 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --time=07:59:00
+#SBATCH --time=00:01:00
 #SBATCH --job-name=seeds_train
 #SBATCH --mem=32GB
 #SBATCH --ntasks=16
 #SBATCH --gres=gpu:1
-#SBATCH --output=myjob_seeds.%j.out
-#SBATCH --error=myjob_seeds.%j.err
+#SBATCH --output=./slurm_reports/train_seeds.%j.out
+#SBATCH --error=./slurm_reports/train_seeds.%j.err
 #SBATCH --partition=gpu
 
 nvidia-smi
+# source /shared/centos7/anaconda3/2022.01/etc/profile.d/conda.sh
+
 # conda activate tf
 # cd /home/sultan.a/Adaptive-Diversity-Promoting
 
@@ -23,4 +25,6 @@ function echo_seeds()
 }
 
 echo_seeds;
+which python
+
 exit;
