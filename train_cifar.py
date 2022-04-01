@@ -11,6 +11,8 @@ from tensorflow.keras.regularizers import l2
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
 from tensorflow.keras.datasets import cifar10, cifar100
+from tensorflow.keras.models import load_model
+
 import numpy as np
 import os
 from model import resnet_v1
@@ -82,31 +84,76 @@ def lr_schedule(epoch):
     return lr
 
 
-model_input = Input(shape=input_shape)
+def create_model():
+    model_input = Input(shape=input_shape)
 
-model_dic = {}
-model_out = []
-for i in range(FLAGS.num_models):
-    model_dic[str(i)] = resnet_v1(
-        input=model_input, depth=depth, num_classes=num_classes, dataset=FLAGS.dataset
+    model_dic = {}
+    model_out = []
+    for i in range(FLAGS.num_models):
+        model_dic[str(i)] = resnet_v1(
+            input=model_input,
+            depth=depth,
+            num_classes=num_classes,
+            dataset=FLAGS.dataset,
+        )
+        model_out.append(model_dic[str(i)][2])
+
+    model_output = tf.keras.layers.concatenate(model_out)
+
+    model = Model(inputs=model_input, outputs=model_output)
+    initial_epoch = 0
+
+    return model, initial_epoch
+
+
+def load_last_model():
+    import re
+
+    if FLAGS.model_dir == "":
+        raise Exception(
+            "Invalid args, need to know model directory to load model from last checkpoint"
+        )
+
+    load_dir = os.path.join(
+        FLAGS.model_dir,
+        "seed_" + str(FLAGS.seed),
     )
-    model_out.append(model_dic[str(i)][2])
 
-model_output = tf.keras.layers.concatenate(model_out)
+    load_dir = os.path.join(
+        load_dir,
+        FLAGS.dataset
+        + "_EE_LED_saved_models"
+        + str(FLAGS.num_models)
+        + "_lamda"
+        + str(FLAGS.lamda)
+        + "_logdetlamda"
+        + str(FLAGS.log_det_lamda)
+        + "_"
+        + str(FLAGS.augmentation),
+    )
 
-model = Model(inputs=model_input, outputs=model_output)
+    model_names = os.listdir(load_dir)
+    last_epoch = max(
+        [int(re.match("model+\.([0-9]+)", name).groups()[0]) for name in model_names]
+    )
+    last_checkpointed_model_name = f"model.{last_epoch}.h5"
+    load_path = os.path.join(
+        load_dir,
+        last_checkpointed_model_name,
+    )
 
-model.compile(
-    loss=Loss_withEE_DPP,
-    optimizer=Adam(lr=lr_schedule(0)),
-    metrics=[acc_metric, Ensemble_Entropy_metric, log_det_metric],
+    model = load_model(load_path, compile=False)
+    return model, last_epoch
+
+
+model, initial_epoch = (
+    create_model() if not FLAGS.load_from_checkpoint else load_last_model()
 )
-model.summary()
-print(model_type)
 
 # Prepare model model saving directory.
 save_dir = os.path.join(
-    os.getcwd() if FLAGS.model_dir == "" else FLAGS.model_dir, "seed_" + str(FLAGS.seed)
+    os.getcwd() if FLAGS.model_dir == "" else FLAGS.model_dir,
+    "seed_" + str(FLAGS.seed),
 )
 
 save_dir = os.path.join(
@@ -126,6 +173,14 @@ model_name = "model.{epoch:03d}.h5"
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
 filepath = os.path.join(save_dir, model_name)
+
+model.compile(
+    loss=Loss_withEE_DPP,
+    optimizer=Adam(lr=lr_schedule(0)),
+    metrics=[acc_metric, Ensemble_Entropy_metric, log_det_metric],
+)
+model.summary()
+print(model_type)
 
 # Prepare callbacks for model saving and for learning rate adjustment.
 checkpoint = ModelCheckpoint(
@@ -162,6 +217,7 @@ if not FLAGS.augmentation:
         shuffle=True,
         verbose=1,
         callbacks=callbacks,
+        initial_epoch=initial_epoch,
     )
 else:
     print("Using real-time data augmentation.")
@@ -218,6 +274,7 @@ else:
         datagen.flow(x_train, y_train_2, batch_size=FLAGS.batch_size),
         validation_data=(x_test, y_test_2),
         epochs=epochs,
+        initial_epoch=initial_epoch,
         verbose=1,
         workers=32,
         callbacks=callbacks,

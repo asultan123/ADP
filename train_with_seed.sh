@@ -10,7 +10,7 @@
 #SBATCH --partition=gpu
 
 nvidia-smi
-model_dir=/scratch/sultan.a/adp_models
+model_dir=./adp_models
 
 which python
 
