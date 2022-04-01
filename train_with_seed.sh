@@ -15,6 +15,7 @@ model_dir=/scratch/sultan.a/adp_models
 which python
 
 seed=$1
+echo Training with $seed
 python train_cifar.py --model_dir=$model_dir --seed=$seed --lamda=2 --log_det_lamda=0.5 --num_models=2 --augmentation=True --dataset=cifar10
 
 exit;
