@@ -18,6 +18,9 @@ tf_dtype = tf.as_dtype("float32")
 
 FLAGS = tf.compat.v1.flags.FLAGS
 tf.compat.v1.flags.DEFINE_integer("seed", 1234, "epoch of the checkpoint to load")
+tf.compat.v1.flags.DEFINE_bool(
+    "load_from_checkpoint", False, "load from last checkpoint"
+)
 tf.compat.v1.flags.DEFINE_float("lamda", 1.0, "lamda for Ensemble Entropy(EE)")
 tf.compat.v1.flags.DEFINE_float("log_det_lamda", 0.5, "lamda for non-ME")
 

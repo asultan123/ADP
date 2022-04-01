@@ -18,8 +18,9 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "--model_dir=/home/sultan/Documents/ADP/models",
-                "--seed=234",
+                // "--load_from_checkpoint=True",
+                "--model_dir=/home/sultan/Documents/ADP/adp_models",
+                "--seed=1759",
                 "--lamda=2",
                 "--log_det_lamda=0.5",
                 "--num_models=2",
